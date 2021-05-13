@@ -1,27 +1,79 @@
-# AngularBgChangeOnRefresh
+# 🌈  Change backgroud Image on refresh in Angular
+ 
+Angular sample directive that takes a list of images and display background image. use local storage to keep track the history of previous bg-image.
+ 
+ ✨
+ we will learn: 🚲
+- How to use directive in angular  ?  🤔
+- How to pass parameter to directive ?
+ 
+ 
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.2.11.
+## Code Snippet
 
-## Development server
+ 
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+```sh
+import { Directive, ElementRef, Input, Renderer2, OnInit } from '@angular/core';
 
-## Code scaffolding
+@Directive({
+  selector: '[appBgChangeImage]',
+})
+export class BgChangeImageDirective implements OnInit {
+  @Input() imagesList = [];
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+  constructor(private elementRef: ElementRef, private renderer: Renderer2) {}
 
-## Build
+  ngOnInit() {
+    let imageIndex;
+    let currentImage = localStorage.getItem('currentBgImage');
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+    if (!currentImage) {
+      imageIndex = 0;
+      localStorage.setItem('currentBgImage', this.imagesList[imageIndex]);
+    }
 
-## Running unit tests
+    let currentImagePath;
+    currentImagePath = `assets/images/bg/${currentImage}`;
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+    this.renderer.setStyle(
+      this.elementRef.nativeElement,
+      'background-image',
+      `url(${currentImagePath})`
+    );
 
-## Running end-to-end tests
+    currentImage =
+      this.imagesList[this.imagesList.indexOf(currentImage) + 1] ||
+      this.imagesList[0];
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+    localStorage.setItem('currentBgImage', currentImage);
+  }
+}
 
-## Further help
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+For Components part :
+
+> app.component.ts
+```sh
+import { Component } from '@angular/core';
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
+})
+export class AppComponent {
+  public bgImagesList = ['bg-1.jpg','bg-2.jpg','bg-3.jpg','bg-4.jpg','bg-5.jpg','bg-6.jpg'];
+}
+```
+
+> app.component.html
+
+```
+<div  appBgChangeImage [imagesList]="bgImagesList"></div>
+```
+   
+## License
+
+MIT
+
